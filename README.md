@@ -29,7 +29,7 @@ You can build fat jar on RPi with:
 
 - [ ] Use [Raspberry Pi Imager](https://www.raspberrypi.com/software/)
   to flash Raspberry Pi OS 64-bit to a microSD card
-  - [ ] Click the gear icon (:gear:) for Advanced Options
+  - [ ] Click the :gear: icon for Advanced Options
     - [ ] Check `Enable SSH`
       - [ ] Check `Set username and password`
       - [ ] Set `Username` to `cage` and enter a `Password`
@@ -72,7 +72,13 @@ ssh cage@raspberrypi
 
 Follow the steps below to install `cage` on Pi 5.
 
-1. Install dependencies for `cage`:
+1. Make sure our OS is up-to-date
+
+    ```sh
+    sudo apt-get update && sudo apt-get -y upgrade
+    ```
+
+2. Install dependencies for `cage`:
 
     ```sh
     sudo apt-get -y install cmake libvulkan-dev libwlroots-dev
@@ -93,7 +99,7 @@ Follow the steps below to install `cage` on Pi 5.
         Build-time dependency scdoc found: NO (tried pkgconfig and cmake)
     </details>
 
-2. Build and install `cage`
+3. Build and install `cage`
 
     ```sh
     # our workspace
@@ -113,15 +119,15 @@ Follow the steps below to install `cage` on Pi 5.
     sudo ninja -C build install
     ```
 
-3. Clone this repository
+4. Clone this repository
 
     ```sh
     cd ~/devel
-    git clone git@github.com:embdur/PiKiosk.git -b cage-setup
+    git clone https://github.com/SergeySn/PiKiosk.git
     cd PiKiosk
     ```
 
-4. Start `cage` on boot
+5. Start `cage` on boot
 
     Copy the systemd unit file for cage:
     ```sh
@@ -144,6 +150,11 @@ Follow the steps below to install `cage` on Pi 5.
     ```
     </details>
 
+    Disable the default display manager
+    ```sh
+    sudo systemctl disable display-manager
+    ```
+
     Enable an instantiated service of `cage`
     ```sh
     sudo ln -s /etc/systemd/system/cage@.service \
@@ -155,7 +166,7 @@ Follow the steps below to install `cage` on Pi 5.
     sudo systemctl set-default graphical.target
     ```
 
-5. PAM configuration
+6. PAM configuration
 
     Copy the PAM configuration file for `cage`
     ```sh
@@ -167,8 +178,10 @@ Follow the steps below to install `cage` on Pi 5.
     This is the same PAM config as in the<a href="https://github.com/cage-kiosk/cage/wiki/Starting-Cage-on-boot-with-systemd">cage wiki</a>
     </details>
 
-6. Reboot the Pi 5
+7. Reboot the Pi 5
 
     ```sh
     sudo reboot
     ```
+
+After reboot, `cage` will start the `galculator` app in kiosk mode.
