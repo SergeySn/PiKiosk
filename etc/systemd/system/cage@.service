@@ -22,7 +22,7 @@ After=getty@%i.service
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/cage /usr/bin/gtk3-widget-factory
+ExecStart=/usr/bin/cage /usr/bin/galculator
 Restart=always
 User=cage
 # Log this user with utmp, letting it show up with commands 'w' and
