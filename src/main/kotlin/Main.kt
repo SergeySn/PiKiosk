@@ -3,10 +3,8 @@ import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowPlacement
-import androidx.compose.ui.window.application
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.*
 
 @Composable @Preview fun App()
 {
@@ -22,7 +20,8 @@ import androidx.compose.ui.window.rememberWindowState
 }
 
 fun main() = application {
-    val windowState = rememberWindowState(placement = WindowPlacement.Maximized)
+    //val windowState = rememberWindowState(placement = WindowPlacement.Maximized)
+    val windowState = rememberWindowState(placement = WindowPlacement.Maximized, size = WindowSize(1920.dp, 1080.dp)) // Set this to match screen resolution
 
     Window(onCloseRequest = ::exitApplication, state = windowState) {
         App()
