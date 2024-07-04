@@ -15,7 +15,7 @@ But before running a Compose app on RPi, run this command first:
 
 export MESA_EXTENSION_OVERRIDE="-GL_ARB_invalidate_subdata"
 
-Otherwise you'll get an error.  For expalation see: https://www.reddit.com/r/Kotlin/comments/1c5jikl/how_do_i_get_compose_working_on_my_raspberry_pi/
+Otherwise you'll get an error.  For explanation see: https://www.reddit.com/r/Kotlin/comments/1c5jikl/how_do_i_get_compose_working_on_my_raspberry_pi/
 
 Then run it with:
 
@@ -31,8 +31,13 @@ You can build fat jar on RPi with:
   to flash Raspberry Pi OS 64-bit to a microSD card
   - [ ] Click the :gear: icon for Advanced Options
     - [ ] Check `Enable SSH`
-      - [ ] Check `Set username and password`
-      - [ ] Set `Username` to `cage` and enter a `Password`
+      - [ ] Select `Use password authentication`
+
+        OR
+      - [ ] Select `Allow public-key authentication only` (more secure)
+        - [ ] `Set authorized_keys for '<username>'`
+    - [ ] Check `Set username and password`
+      - [ ] Enter `Username` and `Password` in the respective fields
     - [ ] Check `Configure Wireless LAN`
       - [ ] Enter `SSID` and `Password` for your Wi-Fi network
       - [ ] Select `Wireless LAN Country`
@@ -46,10 +51,6 @@ You can build fat jar on RPi with:
 If you need to change any of these settings later, run `sudo raspi-config` in a
 terminal on the Pi 5.
 
-The username `cage` is important here as it is used by the systemd service.
-If you use a different username, you will need to update the systemd service
-or add the `cage` user later(e.g. with `sudo useradd cage`)
-
 ## Hardware Setup
 
 - [ ] Connect the following h/w with the Pi 5
@@ -61,13 +62,12 @@ or add the `cage` user later(e.g. with `sudo useradd cage`)
 
 Pi 5 will boot up and show the desktop environment.
 
-
 ## Setup Cage
 
 `ssh` into the Pi 5 with the username and password you set during the OS installation.
 
 ```sh
-ssh cage@raspberrypi
+ssh <username>@<hostname/IP>
 ```
 
 Follow the steps below to install `cage` on Pi 5.
@@ -154,38 +154,44 @@ Follow the steps below to install `cage` on Pi 5.
         ```
         </details>
 
-    2. Disable the default display manager(`lightdm`)
+    2. Add `cage` user. This is required by `cage@.service`
+
+        ```sh
+        sudo useradd -m cage
+        ```
+
+    3. Disable the default display manager(`lightdm`)
 
         ```sh
         sudo systemctl disable display-manager
         ```
 
-    3. Enable an instantiated service of `cage`
+    4. Enable an instantiated service of `cage`
 
         ```sh
         sudo ln -s /etc/systemd/system/cage@.service \
             /etc/systemd/system/graphical.target.wants/cage@tty1.service
         ```
 
-    4. Change systemd's default target to the graphical target
+    5. Change systemd's default target to the graphical target
 
         ```sh
         sudo systemctl set-default graphical.target
         ```
 
-6. PAM configuration
+    6. PAM configuration
 
-    Copy the PAM configuration file for `cage`
-    ```sh
-    sudo cp files/cage-pam-cfg /etc/pam.d/cage
-    ```
+        Copy the PAM configuration file for `cage`
+        ```sh
+        sudo cp files/cage-pam-cfg /etc/pam.d/cage
+        ```
 
-    <details>
-    <summary>Notes</summary>
-    This is the same PAM config as in the<a href="https://github.com/cage-kiosk/cage/wiki/Starting-Cage-on-boot-with-systemd">cage wiki</a>
-    </details>
+        <details>
+        <summary>Notes</summary>
+        This is the same PAM config as in the<a href="https://github.com/cage-kiosk/cage/wiki/Starting-Cage-on-boot-with-systemd">cage wiki</a>
+        </details>
 
-7. Reboot the Pi 5
+6. Reboot the Pi 5
 
     ```sh
     sudo reboot
@@ -224,7 +230,20 @@ After reboot, `cage` will start the `galculator` app in kiosk mode.
     ```
 
     This will produce a JAR file at
-    `/home/cage/devel/PiKiosk/build/compose/jars/PiKiosk-linux-arm64-1.0.0.jar`.
+    `${HOME}/devel/PiKiosk/build/compose/jars/PiKiosk-linux-arm64-1.0.0.jar`.
+
+    As this .jar is supposed to be accessible by the `cage` user, copy it to
+    `/home/cage`.
+
+    ```sh
+    sudo cp \
+    ${HOME}/devel/PiKiosk/build/compose/jars/PiKiosk-linux-arm64-1.0.0.jar \
+    /home/cage/
+    ```
+
+    ```sh
+    sudo chown cage:cage /home/cage/PiKiosk-linux-arm64-1.0.0.jar
+    ```
 
 5. Update `cage`'s systemd unit file (`/etc/systemd/system/cage@.service`) to
 run your compose app instead of `galculator`
@@ -235,7 +254,7 @@ run your compose app instead of `galculator`
     # run with cage
     #. e.g. if you want to run the JAR file created in the
     # previous step do:
-    JAR=/home/cage/devel/PiKiosk/build/compose/jars/PiKiosk-linux-arm64-1.0.0.jar
+    JAR=/home/cage/PiKiosk-linux-arm64-1.0.0.jar
 
     sudo sed -i -e \
       "s@ExecStart=.*@ExecStart=/usr/bin/cage -- java -jar ${JAR}@" \
