@@ -233,7 +233,27 @@ run your compose app instead of `galculator`
       /etc/systemd/system/cage@.service
     ```
 
-1. Workaround https://github.com/JetBrains/skiko/issues/649
+5. Optional: Force a specific resolution in Compose app
+
+    As of
+    https://github.com/SergeySn/PiKiosk/commit/d4b8842c9770020d417a28ebe111b171a65eb67c,
+    the Compose app is forced to use 1920x1080 resolution. To force a different
+    resolution replace `WindowSize(1920.dp, 1080.dp)` in
+    [Main.kt](src/main/kotlin/Main.kt) with the desired values for width and
+    height.
+
+6. Optional: Force Pi to use a specific Resolution
+
+    ```sh
+    # Replace 1920x1080@60 with desired <width>x<height>x<refresh-rate>.
+    # For the app to appear fullscreen, make sure to use the same values as in
+    # the previous step.
+    sed -i -e \
+    's@#ExecStartPre=.*@ExecStartPre=wlr-randr --output HDMI-A-2 --mode 1920x1080@60@' \
+    /etc/systemd/system/cage@.service
+    ```
+
+7. Workaround https://github.com/JetBrains/skiko/issues/649
 
     ```sh
     sed -i -e \
@@ -243,7 +263,7 @@ run your compose app instead of `galculator`
 
     Please see the discussion [here](https://www.reddit.com/r/Kotlin/comments/1c5jikl/how_do_i_get_compose_working_on_my_raspberry_pi) for more info.
 
-2. Restart `cage` service for the changes to take effect
+8. Restart `cage` service for the changes to take effect
 
     ```sh
     sudo systemctl daemon-reload
