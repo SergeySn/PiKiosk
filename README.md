@@ -129,48 +129,55 @@ Follow the steps below to install `cage` on Pi 5.
 
 5. Start `cage` on boot
 
-    Copy the systemd unit file for cage:
-    ```sh
-    sudo cp etc/systemd/system/cage@.service /etc/systemd/system/cage@.service
-    ```
+    1. Install the systemd unit file for `cage` from this repository to the system.
 
-    <details>
-    <summary>Notes</summary>
-    This is the same template as in the <a href="https://github.com/cage-kiosk/cage/wiki/Starting-Cage-on-boot-with-systemd">cage wiki</a>
+        The [systemd unit file template](files/cage-template.service) is set
+        up to run `galculator` by default as it is available in stock Pi OS.
 
-    The only difference is that we replace the following line
+        ```sh
+        sudo cp files/cage-template.service /etc/systemd/system/cage@.service
+        ```
 
-    ```sh
-    ExecStart=/usr/bin/cage /usr/bin/gtk3-widget-factory
-    ```
-    with
+        <details>
+        <summary>Notes</summary>
+        This is the same template as in the <a href="https://github.com/cage-kiosk/cage/wiki/Starting-Cage-on-boot-with-systemd">cage wiki</a>
 
-    ```sh
-    ExecStart=/usr/bin/cage /usr/bin/galculator
-    ```
-    </details>
+        The only difference is that the following line
 
-    Disable the default display manager
-    ```sh
-    sudo systemctl disable display-manager
-    ```
+        ```sh
+        ExecStart=/usr/bin/cage /usr/bin/gtk3-widget-factory
+        ```
+        has been replaced with
 
-    Enable an instantiated service of `cage`
-    ```sh
-    sudo ln -s /etc/systemd/system/cage@.service \
-        /etc/systemd/system/graphical.target.wants/cage@tty1.service
-    ```
+        ```sh
+        ExecStart=/usr/bin/cage /usr/bin/galculator
+        ```
+        </details>
 
-    Change systemd's default target to the graphical target
-    ```sh
-    sudo systemctl set-default graphical.target
-    ```
+    2. Disable the default display manager(`lightdm`)
+
+        ```sh
+        sudo systemctl disable display-manager
+        ```
+
+    3. Enable an instantiated service of `cage`
+
+        ```sh
+        sudo ln -s /etc/systemd/system/cage@.service \
+            /etc/systemd/system/graphical.target.wants/cage@tty1.service
+        ```
+
+    4. Change systemd's default target to the graphical target
+
+        ```sh
+        sudo systemctl set-default graphical.target
+        ```
 
 6. PAM configuration
 
     Copy the PAM configuration file for `cage`
     ```sh
-    sudo cp etc/pam.d/cage /etc/pam.d/cage
+    sudo cp files/cage-pam-cfg /etc/pam.d/cage
     ```
 
     <details>
@@ -185,3 +192,60 @@ Follow the steps below to install `cage` on Pi 5.
     ```
 
 After reboot, `cage` will start the `galculator` app in kiosk mode.
+
+## Run the sample Compose app with Cage
+
+1. SSH into Pi again
+
+    ```sh
+    ssh <user>@<hostname/IP>
+    ```
+
+2. Install JRE, required to run compose app
+
+   ```sh
+   sudo apt-get update && sudo apt install default-jre
+   ```
+
+3. Build the sample app
+
+    ```sh
+    cd ~/devel/PiKiosk
+    ./gradlew build
+    ```
+
+    This will produce a JAR file at
+    `/home/cage/devel/PiKiosk/build/libs/PiKiosk-1.0-SNAPSHOT.jar`.
+
+4. Update `cage`'s systemd unit file (`/etc/systemd/system/cage@.service`) to
+run your compose app instead of `galculator`
+
+    ```sh
+    #JAR=</path/to/jar>
+    # replcae </path/to/jar> with actual path of the JAR file that you want to
+    # run with cage
+    #. e.g. if you want to run the JAR file created in the
+    # previous step do:
+    JAR=/home/cage/devel/PiKiosk/build/libs/PiKiosk-1.0-SNAPSHOT.jar
+
+    sed -i -e \
+      's@ExecStart=.*@ExecStart=/usr/bin/cage -- java -jar ${JAR}@' \
+      /etc/systemd/system/cage@.service
+    ```
+
+1. Workaround https://github.com/JetBrains/skiko/issues/649
+
+    ```sh
+    sed -i -e \
+    's@#Environment=.*@Environment="MESA_EXTENSION_OVERRIDE=-GL_ARB_invalidate_subdata"@' \
+    /etc/systemd/system/cage@.service
+    ```
+
+    Please see the discussion [here](https://www.reddit.com/r/Kotlin/comments/1c5jikl/how_do_i_get_compose_working_on_my_raspberry_pi) for more info.
+
+2. Restart `cage` service for the changes to take effect
+
+    ```sh
+    sudo systemctl daemon-reload
+    sudo systemctl restart cage@tty1.service
+    ```
