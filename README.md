@@ -204,18 +204,18 @@ After reboot, `cage` will start the `galculator` app in kiosk mode.
 2. Install JRE, required to run compose app
 
    ```sh
-   sudo apt-get update && sudo apt install default-jre
+   sudo apt-get update && sudo apt-get -y install default-jre
    ```
 
 3. Build the sample app
 
     ```sh
     cd ~/devel/PiKiosk
-    ./gradlew build
+    ./gradlew packageUberJarForCurrentOS
     ```
 
     This will produce a JAR file at
-    `/home/cage/devel/PiKiosk/build/libs/PiKiosk-1.0-SNAPSHOT.jar`.
+    `/home/cage/devel/PiKiosk/build/compose/jars/PiKiosk-linux-arm64-1.0.0.jar`.
 
 4. Update `cage`'s systemd unit file (`/etc/systemd/system/cage@.service`) to
 run your compose app instead of `galculator`
@@ -226,10 +226,10 @@ run your compose app instead of `galculator`
     # run with cage
     #. e.g. if you want to run the JAR file created in the
     # previous step do:
-    JAR=/home/cage/devel/PiKiosk/build/libs/PiKiosk-1.0-SNAPSHOT.jar
+    JAR=/home/cage/devel/PiKiosk/build/compose/jars/PiKiosk-linux-arm64-1.0.0.jar
 
-    sed -i -e \
-      's@ExecStart=.*@ExecStart=/usr/bin/cage -- java -jar ${JAR}@' \
+    sudo sed -i -e \
+      "s@ExecStart=.*@ExecStart=/usr/bin/cage -- java -jar ${JAR}@" \
       /etc/systemd/system/cage@.service
     ```
 
@@ -248,15 +248,17 @@ run your compose app instead of `galculator`
     # Replace 1920x1080@60 with desired <width>x<height>x<refresh-rate>.
     # For the app to appear fullscreen, make sure to use the same values as in
     # the previous step.
-    sed -i -e \
-    's@#ExecStartPre=.*@ExecStartPre=wlr-randr --output HDMI-A-2 --mode 1920x1080@60@' \
+    # Also replace HDMI-A-2 with the output <name> of your display. You can list
+    # the displays using the `wlr-randr` command.
+    sudo sed -i -e \
+    's/#ExecStartPre=.*/ExecStartPre=wlr-randr --output HDMI-A-2 --mode 1920x1080@60/' \
     /etc/systemd/system/cage@.service
     ```
 
 7. Workaround https://github.com/JetBrains/skiko/issues/649
 
     ```sh
-    sed -i -e \
+    sudo sed -i -e \
     's@#Environment=.*@Environment="MESA_EXTENSION_OVERRIDE=-GL_ARB_invalidate_subdata"@' \
     /etc/systemd/system/cage@.service
     ```
