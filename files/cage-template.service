@@ -22,6 +22,7 @@ After=getty@%i.service
 
 [Service]
 Type=simple
+#Environment=
 ExecStart=/usr/bin/cage /usr/bin/galculator
 Restart=always
 User=cage
