@@ -160,6 +160,11 @@ Follow the steps below to install `cage` on Pi 5.
         sudo useradd -m cage
         ```
 
+        Set a password for `cage` user
+        ```sh
+        sudo passwd cage
+        ```
+
     3. Disable the default display manager(`lightdm`)
 
         ```sh
@@ -290,6 +295,8 @@ run your compose app instead of `galculator`
     # Also replace HDMI-A-2 with the output <name> of your display. You can list
     # the displays using the `wlr-randr` command.
 
+    su cage
+    export XDG_RUNTIME_DIR=/run/user/${UID}
     wlr-randr --output HDMI-A-2 --mode 1920x1080@60
     ```
 
