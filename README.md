@@ -306,6 +306,8 @@ run your compose app instead of `galculator`
 
 ## Extras
 
+The following steps are optional and are for hardening the kiosk setup.
+
 1. Disable splash screen
 
     ```sh
