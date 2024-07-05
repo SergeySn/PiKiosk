@@ -105,7 +105,9 @@ Follow the steps below to install `cage` on Pi 5.
     # our workspace
     mkdir ~/devel && cd ~/devel
 
-    # master branch requires a higher version of libwlroots-dev
+    # master branch of cage requires a higher version of libwlroots-dev
+    # whereas Debian bookworm has an older version(v0.1.4). We build v0.1.5
+    # here, which is the latest release at the time this writing
     git clone https://github.com/cage-kiosk/cage.git -b v0.1.5
     cd cage
 
