@@ -303,3 +303,22 @@ run your compose app instead of `galculator`
     ```
 
     :warning: This command will only work if cage is already showing some app.
+
+## Extras
+
+1. Disable splash screen
+
+    ```sh
+    sudo raspi-config
+    ```
+    - Select `System Options`
+    - Select `Splash Screen`
+    - Select `No`
+    - Select `Ok`
+    - Select `Finish`
+
+2.  Append `fbcon=map:1` to `/boot/firmware/cmdline.txt`
+
+    tells fbcon not to take over the console. This takes care of the messages
+    that appear when the splash screen is disabled.
+    See: https://www.kernel.org/doc/Documentation/fb/fbcon.txt
