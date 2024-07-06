@@ -324,3 +324,13 @@ The following steps are optional and are for hardening the kiosk setup.
     tells fbcon not to take over the console. This takes care of the messages
     that appear when the splash screen is disabled.
     See: https://www.kernel.org/doc/Documentation/fb/fbcon.txt
+
+3. Alternatively, you can replace the splash screen image by replacing file:
+
+   `/usr/share/plymouth/themes/pix/splash.png`
+   
+   with your own image. And then running 
+
+   `sudo plymouth-set-default-theme --rebuild-initrd pix` 
+
+   command to persist it.
