@@ -24,9 +24,7 @@ After=getty@%i.service
 Type=simple
 #Environment=
 #ExecStartPre=
-#ExecStart=/usr/bin/cage /usr/bin/galculator
-ExecStart=/usr/bin/cage -- java -jar /home/cage/PiKiosk-linux-arm64-1.0.0.jar
-#ExecStartPost=/bin/bash -c 'sleep 9; export XDG_RUNTIME_DIR=/run/user/1001; /usr/bin/wlr-randr --output HDMI-A-2 --mode 1920x1080@60'
+ExecStart=/usr/bin/cage -- sh -c 'wlr-randr --output HDMI-A-2 --mode 1920x1080@60 && java -jar /home/cage/PiKiosk-linux-arm64-1.0.0.jar'
 Restart=always
 User=cage
 # Log this user with utmp, letting it show up with commands 'w' and
