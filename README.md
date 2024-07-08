@@ -264,7 +264,7 @@ run your compose app instead of `galculator`
     JAR=/home/cage/PiKiosk-linux-arm64-1.0.0.jar
 
     sudo sed -i -e \
-      "s@ExecStart=.*@ExecStart=/usr/bin/cage -- java -jar ${JAR}@" \
+      "s@^ExecStart=.*@ExecStart=/usr/bin/cage -- java -jar ${JAR}@" \
       /etc/systemd/system/cage@.service
     ```
 
@@ -272,7 +272,7 @@ run your compose app instead of `galculator`
 
     ```sh
     sudo sed -i -e \
-    's@#Environment=.*@Environment="MESA_EXTENSION_OVERRIDE=-GL_ARB_invalidate_subdata"@' \
+    's@^#Environment=.*@Environment="MESA_EXTENSION_OVERRIDE=-GL_ARB_invalidate_subdata"@' \
     /etc/systemd/system/cage@.service
     ```
 
@@ -288,7 +288,7 @@ run your compose app instead of `galculator`
     sudo systemctl restart cage@tty1.service
     ```
 
-8. Optional: Force Pi to use a specific Resolution
+8. Optional: Force `cage` to use a specific resolution
 
     ```sh
     # Replace 1920x1080@60 with desired <width>x<height>x<refresh-rate>.
@@ -296,13 +296,25 @@ run your compose app instead of `galculator`
     # step 3.
     # Also replace HDMI-A-2 with the output <name> of your display. You can list
     # the displays using the `wlr-randr` command.
+    JAR=/home/cage/PiKiosk-linux-arm64-1.0.0.jar
+    WLR_RANDR_CMD="wlr-randr --output HDMI-A-2 --mode 1920x1080@60"
 
-    su cage
-    export XDG_RUNTIME_DIR=/run/user/${UID}
-    wlr-randr --output HDMI-A-2 --mode 1920x1080@60
+    sudo sed -i -e \
+    "s|^ExecStart=.*|ExecStart=/usr/bin/cage -- sh -c '${WLR_RANDR_CMD} \&\& java -jar ${JAR}'|" \
+    /etc/systemd/system/cage@.service
+
+    sudo systemctl daemon-reload && sudo systemctl restart cage@tty1
     ```
 
-    :warning: This command will only work if cage is already showing some app.
+    ```sh
+    # To experiment with different output modes of your display, you need to
+    # login as cage user
+    su cage
+    export XDG_RUNTIME_DIR=/run/user/${UID}
+    wlr-randr # display available outputs and modes
+    wlr-randr --output HDMI-A-2 --mode 1920x1080@60 # select desired output/mode
+    ```
+    :warning: `wlr-randr` only works when `cage` is running.
 
 ## Extras
 
