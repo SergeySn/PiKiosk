@@ -243,9 +243,7 @@ After reboot, `cage` will start the `galculator` app in kiosk mode.
     `/home/cage`.
 
     ```sh
-    sudo cp \
-    ${HOME}/devel/PiKiosk/build/compose/jars/PiKiosk-linux-arm64-1.0.0.jar \
-    /home/cage/
+    sudo cp ${HOME}/devel/PiKiosk/build/compose/jars/PiKiosk-linux-arm64-1.0.0.jar /home/cage/
     ```
 
     ```sh
@@ -257,15 +255,17 @@ run your compose app instead of `galculator`
 
     ```sh
     #JAR=</path/to/jar>
-    # replcae </path/to/jar> with actual path of the JAR file that you want to
+    # replace </path/to/jar> with actual path of the JAR file that you want to
     # run with cage
     #. e.g. if you want to run the JAR file created in the
     # previous step do:
     JAR=/home/cage/PiKiosk-linux-arm64-1.0.0.jar
 
-    sudo sed -i -e \
-      "s@^ExecStart=.*@ExecStart=/usr/bin/cage -- java -jar ${JAR}@" \
-      /etc/systemd/system/cage@.service
+    sudo sed -i -e "s@^ExecStart=.*@ExecStart=/usr/bin/cage -- java -jar ${JAR}@" /etc/systemd/system/cage@.service
+    ```
+    or
+    ```sh
+    sudo sed -i -e "s@^ExecStart=.*@ExecStart=/usr/bin/cage -- java -jar /home/cage/PiKiosk-linux-arm64-1.0.0.jar@" /etc/systemd/system/cage@.service
     ```
 
 6. Workaround https://github.com/JetBrains/skiko/issues/649
@@ -294,21 +294,29 @@ run your compose app instead of `galculator`
     # Replace 1920x1080@60 with desired <width>x<height>x<refresh-rate>.
     # For the app to appear fullscreen, make sure to use the same values as in
     # step 3.
-    # Also replace HDMI-A-2 with the output <name> of your display. You can list
-    # the displays using the `wlr-randr` command.
+    # Also replace HDMI-A-2 with the output <name> of your display. 
+    # You can list the displays using the `wlr-randr` command.
     JAR=/home/cage/PiKiosk-linux-arm64-1.0.0.jar
+   
+    # Using the default resolution:
+    WLR_RANDR_CMD="wlr-randr --output HDMI-A-2"
+    
+    # Or setting a specific one:
     WLR_RANDR_CMD="wlr-randr --output HDMI-A-2 --mode 1920x1080@60"
 
     sudo sed -i -e \
     "s|^ExecStart=.*|ExecStart=/usr/bin/cage -- sh -c '${WLR_RANDR_CMD} \&\& java -jar ${JAR}'|" \
     /etc/systemd/system/cage@.service
 
+    # Or, edit it manually with:
+    sudo nano /etc/systemd/system/cage@.service
+   
+    # In either case, to activate the changes, run:
     sudo systemctl daemon-reload && sudo systemctl restart cage@tty1
     ```
 
     ```sh
-    # To experiment with different output modes of your display, you need to
-    # login as cage user
+    # To experiment with different output modes of your display, you need to login as cage user
     su cage
     export XDG_RUNTIME_DIR=/run/user/${UID}
     wlr-randr # display available outputs and modes
