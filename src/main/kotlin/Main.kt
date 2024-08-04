@@ -9,6 +9,7 @@ import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 
@@ -38,7 +39,7 @@ import androidx.compose.ui.window.*
 
 fun main() = application {
     //val windowState = rememberWindowState(placement = WindowPlacement.Maximized)
-    val windowState = rememberWindowState(placement = WindowPlacement.Maximized, size = WindowSize(1024.dp, 600.dp)) // Set this to match screen resolution
+    val windowState = rememberWindowState(placement = WindowPlacement.Maximized, size = DpSize(1024.dp, 600.dp)) // Set this to match screen resolution
 
     Window(onCloseRequest = ::exitApplication, state = windowState) {
         App()

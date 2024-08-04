@@ -7,23 +7,28 @@ To create a fat jar file, click on the gradle button on the right side of IDE to
 Expand on Tasks/compose_desktop/ scroll down and right-click on "packageUberJarForCurrentOS" and select Run.
 This will produce the "build/compose/jars/PiKiosk-linux-x64-1.0.0.jar" file.
 
-You can build the project on RPi from sources with this command:
+Note: This tutorial has been tested with default Java:
+OpenJDK Runtime Environment (17.0.11+9) (build 17.0.11+9-Debian-1deb12u1)
 
+You can build the project on RPi from sources with this command:
 ./gradlew build
 
 But before running a Compose app on RPi, run this command first:
-
 export MESA_EXTENSION_OVERRIDE="-GL_ARB_invalidate_subdata"
 
-Otherwise you'll get an error.  For explanation see: https://www.reddit.com/r/Kotlin/comments/1c5jikl/how_do_i_get_compose_working_on_my_raspberry_pi/
+Otherwise, you'll get an error: "A fatal error has been detected by the Java Runtime Environment..."
+For explanation see: https://www.reddit.com/r/Kotlin/comments/1c5jikl/how_do_i_get_compose_working_on_my_raspberry_pi/
 
 Then run it with:
-
+cd /home/demo/proj/PiKiosk
 ./gradlew run
+Note: it won't run if you are trying to run it from a headless environment such as terminal via SSH.
 
 You can build fat jar on RPi with:
-
 ./gradlew packageUberJarForCurrentOS
+
+And run it with:
+java -jar /home/demo/proj/PiKiosk/build/compose/jars/PiKiosk-linux-arm64-1.0.0.jar
 
 ## OS Installation
 
