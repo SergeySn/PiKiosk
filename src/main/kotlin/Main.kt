@@ -39,7 +39,7 @@ import androidx.compose.ui.window.*
 
 fun main() = application {
     //val windowState = rememberWindowState(placement = WindowPlacement.Maximized)
-    val windowState = rememberWindowState(placement = WindowPlacement.Maximized, size = DpSize(1024.dp, 600.dp)) // Set this to match screen resolution
+    val windowState = rememberWindowState(placement = WindowPlacement.Fullscreen, size = DpSize(1024.dp, 600.dp)) // Set this to match screen resolution
 
     Window(onCloseRequest = ::exitApplication, state = windowState) {
         App()
