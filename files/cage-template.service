@@ -24,7 +24,9 @@ After=getty@%i.service
 Type=simple
 #Environment=
 #ExecStartPre=
-ExecStart=/usr/bin/cage -- sh -c 'wlr-randr --output HDMI-A-2 --mode 1920x1080@60 && java -jar /home/cage/PiKiosk-linux-arm64-1.0.0.jar'
+#ExecStart=/usr/bin/cage /usr/bin/galculator
+#ExecStart=/usr/bin/cage -- sh -c 'wlr-randr --output HDMI-A-2 --mode 1280x800@60 && /home/cage/run_iroup.sh'
+ExecStart=/usr/bin/cage /home/cage/run_iroup.sh
 Restart=always
 User=cage
 # Log this user with utmp, letting it show up with commands 'w' and
