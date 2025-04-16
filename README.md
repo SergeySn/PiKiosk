@@ -108,11 +108,12 @@ Follow the steps below to install `cage` on Pi 5.
 
     ```sh
     # our workspace
-    mkdir ~/devel && cd ~/devel
+    mkdir ~/proj && cd ~/proj
 
     # master branch of cage requires a higher version of libwlroots-dev
     # whereas Debian bookworm has an older version(v0.1.4). We build v0.1.5
-    # here, which is the latest release at the time this writing
+    # here, which is the latest release at the time this writing.
+    # Update: now the latest version is 0.2.0
     git clone https://github.com/cage-kiosk/cage.git -b v0.1.5
     cd cage
 
@@ -129,7 +130,7 @@ Follow the steps below to install `cage` on Pi 5.
 4. Clone this repository
 
     ```sh
-    cd ~/devel
+    cd ~/proj
     git clone https://github.com/SergeySn/PiKiosk.git
     cd PiKiosk
     ```
@@ -138,8 +139,7 @@ Follow the steps below to install `cage` on Pi 5.
 
     1. Install the systemd unit file for `cage` from this repository to the system.
 
-        The [systemd unit file template](files/cage-template.service) is set
-        up to run `galculator` by default as it is available in stock Pi OS.
+        The [systemd unit file template](files/cage-template.service) is set up to run `iro_up.sh`.
 
         ```sh
         sudo cp files/cage-template.service /etc/systemd/system/cage@.service
@@ -154,11 +154,8 @@ Follow the steps below to install `cage` on Pi 5.
         ```sh
         ExecStart=/usr/bin/cage /usr/bin/gtk3-widget-factory
         ```
-        has been replaced with
+        has been adjusted for our program.
 
-        ```sh
-        ExecStart=/usr/bin/cage /usr/bin/galculator
-        ```
         </details>
 
     2. Add `cage` user. This is required by `cage@.service`
@@ -181,8 +178,7 @@ Follow the steps below to install `cage` on Pi 5.
     4. Enable an instantiated service of `cage`
 
         ```sh
-        sudo ln -s /etc/systemd/system/cage@.service \
-            /etc/systemd/system/graphical.target.wants/cage@tty1.service
+        sudo ln -s /etc/systemd/system/cage@.service /etc/systemd/system/graphical.target.wants/cage@tty1.service
         ```
 
     5. Change systemd's default target to the graphical target
@@ -200,7 +196,7 @@ Follow the steps below to install `cage` on Pi 5.
 
         <details>
         <summary>Notes</summary>
-        This is the same PAM config as in the<a href="https://github.com/cage-kiosk/cage/wiki/Starting-Cage-on-boot-with-systemd">cage wiki</a>
+        This is the same PAM config as in the <a href="https://github.com/cage-kiosk/cage/wiki/Starting-Cage-on-boot-with-systemd">cage wiki</a>
         </details>
 
 6. Reboot the Pi 5
@@ -237,18 +233,16 @@ After reboot, `cage` will start the `galculator` app in kiosk mode.
 4. Build the sample app
 
     ```sh
-    cd ~/devel/PiKiosk
+    cd ~/proj/PiKiosk
     ./gradlew packageUberJarForCurrentOS
     ```
 
-    This will produce a JAR file at
-    `${HOME}/devel/PiKiosk/build/compose/jars/PiKiosk-linux-arm64-1.0.0.jar`.
+    This will produce a JAR file at `${HOME}/proj/PiKiosk/build/compose/jars/PiKiosk-linux-arm64-1.0.0.jar`.
 
-    As this .jar is supposed to be accessible by the `cage` user, copy it to
-    `/home/cage`.
+    As this .jar is supposed to be accessible by the `cage` user, copy it to `/home/cage`.
 
     ```sh
-    sudo cp ${HOME}/devel/PiKiosk/build/compose/jars/PiKiosk-linux-arm64-1.0.0.jar /home/cage/
+    sudo cp ${HOME}/proj/PiKiosk/build/compose/jars/PiKiosk-linux-arm64-1.0.0.jar /home/cage/
     ```
 
     ```sh
