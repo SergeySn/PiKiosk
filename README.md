@@ -200,12 +200,23 @@ Follow the steps below to install `cage` on Pi 5.
         </details>
 
 6. Reboot the Pi 5
-
     ```sh
     sudo reboot
     ```
+    After reboot, `cage` will start the `galculator` app in kiosk mode.
 
-After reboot, `cage` will start the `galculator` app in kiosk mode.
+
+7. Stop starting Cage on boot (in case you need to debug something)
+
+   Undo: sudo ln -s /etc/systemd/system/cage@.service /etc/systemd/system/graphical.target.wants/cage@tty1.service
+   ```sh
+   sudo rm /etc/systemd/system/graphical.target.wants/cage@tty1.service
+   ```
+
+   Undo command "sudo systemctl disable display-manager" by
+   ```sh
+   sudo systemctl enable lightdm
+   ```
 
 ## Run the sample Compose app with Cage
 
